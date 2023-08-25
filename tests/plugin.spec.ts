@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import md from 'markdown-it'
 import tableSort from '../src'
@@ -150,5 +150,26 @@ describe('table sort', () => {
         </table>
       `)
     )
+  })
+
+  it('do not sort when rows count less than 2', () => {
+    const sortRows = vi.fn(() => 0)
+
+    md().use(tableSort, { sortRows }).render(normalizeLines(`
+      | h1 |
+      | --- |
+      | a |
+    `))
+
+    expect(sortRows).not.toHaveBeenCalled()
+
+    md().use(tableSort, { sortRows }).render(normalizeLines(`
+      | h1 |
+      | --- |
+      | a |
+      | b |
+    `))
+
+    expect(sortRows).toHaveBeenCalled()
   })
 })

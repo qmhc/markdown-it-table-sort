@@ -72,28 +72,30 @@ export function tableSort(md: MarkdownIt, options: PluginOptions = {}) {
       }
     }
 
-    const rowChunk = rows.map(row => row.chunk)
+    if (rows.length > 1) {
+      const rowChunk = rows.map(row => row.chunk)
 
-    rows.sort((prev, next) => sortRows(prev.content, next.content))
-    reverse && rows.reverse()
+      rows.sort((prev, next) => sortRows(prev.content, next.content))
+      reverse && rows.reverse()
 
-    const sortedRowChunk = rows.map(row => row.chunk)
-    const newChunks: Token[][] = []
+      const sortedRowChunk = rows.map(row => row.chunk)
+      const newChunks: Token[][] = []
 
-    for (let i = 0, len = chunks.length; i < len; ++i) {
-      const chunk = chunks[i]
-      const chunkIdx = rowChunk.findIndex(c => c === i)
+      for (let i = 0, len = chunks.length; i < len; ++i) {
+        const chunk = chunks[i]
+        const chunkIdx = rowChunk.findIndex(c => c === i)
 
-      if (~chunkIdx) {
-        newChunks.push(chunks[sortedRowChunk[chunkIdx]])
-      } else {
-        newChunks.push(chunk)
+        if (~chunkIdx) {
+          newChunks.push(chunks[sortedRowChunk[chunkIdx]])
+        } else {
+          newChunks.push(chunk)
+        }
       }
+
+      const newTokens = newChunks.flat()
+
+      tokens.splice(idx + 1, newTokens.length, ...newTokens)
     }
-
-    const newTokens = newChunks.flat()
-
-    tokens.splice(idx + 1, newTokens.length, ...newTokens)
 
     return tbodyOpen
       ? tbodyOpen(tokens, idx, options, env, self)
